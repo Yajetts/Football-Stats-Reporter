@@ -33,7 +33,7 @@ class QueryResult(BaseModel):
         ..., description="Source references used"
     )
 
-class CustomAIAssistant:
+class FootballStatsReporter:
     def __init__(
         self,
         data_path: str,
@@ -49,12 +49,11 @@ class CustomAIAssistant:
         
         # Customize this prompt for your use case
         self.system_prompt = """
-        You are a helpful AI Assistant. Customize this prompt to define:
-        1. Your assistant's role and purpose
-        2. Key responsibilities
-        3. Response style and format
-        4. Any specific guidelines or restrictions
-        5. Special instructions for handling certain types of queries
+         You are a helpful AI Football Stats Reporter with access to a database of football information:
+        1. Your role is to find a particular statistic related to a football player or team and to display it as a repsonse.
+        2. You are responsible to find reliable and trustable data from your tool to access the database and provide the requested information.
+        3. You are only supposed to answer queries related to football statistics and no other topic or sport.
+        4. Responses will only be diaplayed for queries related to football
         """
 
         self.configure_settings()
@@ -98,14 +97,14 @@ class CustomAIAssistant:
 
     def _create_agent(self):
         """Set up the agent with custom tools"""
-        query_engine = self.index.as_query_engine(similarity_top_k=5)
+        query_engine = self.index.as_query_engine(similarity_top_k=10)
         
         # Basic search tool
         search_tool = QueryEngineTool(
             query_engine=query_engine,
             metadata=ToolMetadata(
                 name="document_search",
-                description="Search through the document database",
+                description="Get information about football statistics, matches and players from the knowledge base",
             ),
         )
         # Example of a custom tool
@@ -123,7 +122,7 @@ class CustomAIAssistant:
 
         # Initialize the agent with tools
         self.agent = ReActAgent.from_tools(
-            [search_tool, custom_tool],
+            [search_tool],
             verbose=True,
             system_prompt=self.system_prompt,
             memory=ChatMemoryBuffer.from_defaults(token_limit=4096),
@@ -148,11 +147,11 @@ class CustomAIAssistant:
         os.makedirs(self.index_path, exist_ok=True)
         self.index.storage_context.persist(persist_dir=self.index_path)
 
-# Example usage
-if __name__ == "__main__":
-    assistant = CustomAIAssistant(
-        data_path="./your_data_directory",
-        index_path="your_index_directory"
-    )
-    result = assistant.query("Your question here")
-    print(result.answer)
+# # Example usage
+# if __name__ == "__main__":
+#     assistant = FootballStatsReporter(
+#         data_path="./your_data_directory",
+#         index_path="your_index_directory"
+#     )
+#     result = assistant.query("Your question here")
+#     print(result.answer)

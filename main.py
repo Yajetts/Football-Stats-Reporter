@@ -1,10 +1,10 @@
 import streamlit as st
 import os
-from utils.schema import CustomAIAssistant
+from utils.schema import FootballStatsReporter
 
 def main():
     # Set up the Streamlit app title
-    st.title("AI Assistant Chatbot")
+    st.title("Football Stats Reporter")
 
     # Initialize session state for the assistant and chat history
     if "assistant" not in st.session_state:
@@ -17,7 +17,7 @@ def main():
         index_path = "./index"  # Directory to store the vector index
         
         try:
-            st.session_state.assistant = CustomAIAssistant(
+            st.session_state.assistant = FootballStatsReporter(
                 data_path=data_path,
                 index_path=index_path
             )
