@@ -1,4 +1,4 @@
-##FootballStatsReporter 
+## FootballStatsReporter 
 
 Football Stats Reporter is an intelligent, agentic RAG (Retrieval-Augmented Generation) system designed to answer questions about football statistics in real-time. Built with cutting-edge AI technologies, this system combines the power of vector databases, language models, and custom agents to provide accurate, reliable, and context-aware responses to user queries. Whether you're looking for player stats, match results, or team performance metrics, this tool acts as your personal football data analyst, crunching numbers and segmenting information to deliver precise answers.
 
