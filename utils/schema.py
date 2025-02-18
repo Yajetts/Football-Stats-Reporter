@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from llama_index.core import (
     SimpleDirectoryReader,
@@ -7,7 +7,7 @@ from llama_index.core import (
     load_index_from_storage,
     Settings,
 )
-from llama_index.llms.groq import Groq
+from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.jinaai import JinaEmbedding
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import QueryEngineTool, ToolMetadata, FunctionTool
@@ -49,11 +49,11 @@ class FootballStatsReporter:
         
         # Customize this prompt for your use case
         self.system_prompt = """
-         You are a helpful AI Football Stats Reporter with access to a database of football information:
-        1. Your role is to find a particular statistic related to a football player or team and to display it as a repsonse.
+        You are a helpful AI Football Stats Reporter with access to a database of football information:
+        1. Your role is to find a particular statistic related to a football player or team and to display it as a response.
         2. You are responsible to find reliable and trustable data from your tool to access the database and provide the requested information.
-        3. You are only supposed to answer queries related to football statistics and no other topic or sport.
-        4. Responses will only be diaplayed for queries related to football
+        3. You are only supposed toanswer queries related to football statistics and no other topic or sport.
+        4. Responses will only be displayed for queries related to football.
         """
 
         self.configure_settings()
@@ -63,13 +63,21 @@ class FootballStatsReporter:
 
     def configure_settings(self):
         """Configure LLM and embedding settings"""
-        # Replace with your preferred LLM
-        Settings.llm = Groq(model="llama-3.1-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))  # Add your LLM configuration here
-        # Replace with your preferred embedding model
+        # Use OpenAI GPT-3.5 Turbo
+        Settings.llm = OpenAI(
+            model="gpt-4",  # Use GPT-3.5 Turbo, or another model supported by OpenRouter
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            default_headers={
+                "HTTP-Referer": "<YOUR_SITE_URL>", # Optional. Site URL for rankings on openrouter.ai.
+                "X-Title": "<YOUR_SITE_NAME>", # Optional. Site title for rankings on openrouter.ai.
+            }
+        )
+        # Use Jina Embeddings (or another embedding model)
         Settings.embed_model = JinaEmbedding(
             api_key=os.getenv("JINA_API_KEY"),
             model="jina-embeddings-v2-base-en",
-        )  # Add your embedding model configuration here
+        )
 
     def load_or_create_index(self):
         """Load existing index or create new one"""
@@ -136,22 +144,33 @@ class FootballStatsReporter:
         """
         if not self.agent:
             raise ValueError("Agent not initialized")
-        response = self.agent.chat(query)
-        return QueryResult(
-            answer=response.response,
-            source_nodes=[],
-        )
+
+        try:
+            # Attempt to generate a response using the agent
+            response = self.agent.chat(query)
+            return QueryResult(
+                answer=response.response,
+                source_nodes=[],
+            )
+        except Exception as e:
+            # Handle specific errors
+            error_message = f"Error generating response: {str(e)}"
+            if "model_not_found" in str(e):
+                error_message = "The requested model is not available. Please try again with a different model."
+            elif "authentication_error" in str(e):
+                error_message = "Authentication failed. Please check your API key."
+            elif "rate_limit_exceeded" in str(e):
+                error_message = "Rate limit exceeded. Please try again later."
+            else:
+                error_message = f"An unexpected error occurred: {str(e)}"
+
+            # Return an error response
+            return QueryResult(
+                answer=error_message,
+                source_nodes=[],
+            )
 
     def save_index(self):
         """Save the vector index to disk"""
         os.makedirs(self.index_path, exist_ok=True)
         self.index.storage_context.persist(persist_dir=self.index_path)
-
-# # Example usage
-# if __name__ == "__main__":
-#     assistant = FootballStatsReporter(
-#         data_path="./your_data_directory",
-#         index_path="your_index_directory"
-#     )
-#     result = assistant.query("Your question here")
-#     print(result.answer)
