@@ -136,7 +136,3 @@ Then open the local URL printed by Streamlit (typically http://localhost:8501).
 - How do I reset the chat?
 	- Refresh the browser or restart the app to clear Streamlit session state.
 
-**Next Steps**
-
-- Would you like me to add a minimal `requirements.txt` and wire `save_index()` so new indexes persist automatically?
-
