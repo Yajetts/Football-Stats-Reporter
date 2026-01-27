@@ -1,8 +1,13 @@
 **Football Stats Reporter**
 
-- **Type:** Streamlit RAG app (chat UI)
-- **Purpose:** Answer football-only questions using a local knowledge base
-- **Core stack:** `streamlit`, `llama-index`, `Gemini (Google)`, `Jina AI Embeddings`, `pydantic`, `python-dotenv`
+A streamlit RAG app (chat UI) that answers football questions using a local knowledge base
+- **Core stack:**
+- `streamlit`
+- `llama-index`
+- `Gemini (Google)`
+- `Jina AI Embeddings`
+- `pydantic`
+- `python-dotenv`
 
 **Overview**
 
@@ -60,17 +65,7 @@ pip install streamlit pydantic python-dotenv \
 		llama-index llama-index-core llama-index-llms-gemini llama-index-embeddings-jinaai
 ```
 
-3) Create `.env` with your keys (do not share these)
-
-```dotenv
-GEMINI_API_KEY=your_gemini_api_key_here
-JINA_API_KEY=your_jina_api_key_here
-# Optional only if you later switch providers/integrations
-# LLAMA_CLOUD_API_KEY=...
-# PINECONE_API_KEY=...
-```
-
-4) Prepare data
+3) Prepare data
 
 - Put your football documents into `data/` (TXT works out of the box; LlamaIndex supports many formats).
 - Example included: `data/test.txt` with dated scorers across matches.
@@ -86,7 +81,7 @@ Then open the local URL printed by Streamlit (typically http://localhost:8501).
 
 **Usage**
 
-- Ask football-only questions in the chat input, for example:
+- Ask football questions in the chat input, for example:
 	- “Who scored for Spain on June 5, 2022?”
 	- “List the goals for Uruguay vs Bolivia on June 27, 2024.”
 	- “Did Salomón Rondón score against Mexico in 2024?”
