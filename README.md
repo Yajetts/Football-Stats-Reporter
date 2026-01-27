@@ -1,7 +1,9 @@
 **Football Stats Reporter**
 
 A streamlit RAG app (chat UI) that answers football questions using a local knowledge base
-- **Core stack:**
+
+
+**Core stack:**
 - `streamlit`
 - `llama-index`
 - `Gemini (Google)`
